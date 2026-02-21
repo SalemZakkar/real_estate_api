@@ -1,0 +1,23 @@
+import { NestFactory, Reflector } from '@nestjs/core';
+import { AppModule } from './app.module';
+import {
+  initialize,
+  createErrorRequestHandler,
+  BaseResponseInterceptor,
+  // hashPassword,
+} from 'core';
+import qs from 'qs';
+
+
+async function bootstrap() {
+  await initialize();
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  let expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('query parser', (str: string) => qs.parse(str));
+  expressApp.get('/api/errors', createErrorRequestHandler());
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new BaseResponseInterceptor(reflector));
+  await app.listen(process.env.PORT!);
+}
+bootstrap().then(() => console.log('STARTED'));
