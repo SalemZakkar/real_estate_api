@@ -11,9 +11,9 @@ import {
 export class AppFile {
   @PrimaryGeneratedColumn('uuid')
   id!: UUID;
-  @Column()
+  @Column('text')
   path!: string;
-  @Column()
+  @Column('text')
   type!: string;
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;

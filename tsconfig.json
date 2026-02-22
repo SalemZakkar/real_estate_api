@@ -23,9 +23,16 @@
       "multer",
       "express",
       "core",
-      "passport"      
+      "passport"
     ]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "emitDecoratorMetadata": true,
+  "experimentalDecorators": true,
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

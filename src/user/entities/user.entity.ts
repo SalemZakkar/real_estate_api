@@ -37,7 +37,7 @@ export class User {
   })
   role!: string;
 
-  @OneToOne(() => AppFile, { onDelete: 'SET NULL', eager: true })
+  @OneToOne(() => AppFile, { onDelete: 'SET NULL', eager: true , nullable: true})
   @JoinColumn()
   @Transform((e) => e.value?.id)
   image?: AppFile | null;

@@ -20,7 +20,7 @@ export class FileService {
     @InjectRepository(AppFile) private readonly repo: Repository<AppFile>,
     private readonly ds: DataSource,
   ) {}
-  ROOT = resolve(process.cwd(), 'uploads');
+  ROOT = process.env.FILE_STORE!;
 
   async saveFile(opts: { files: Express.Multer.File[]; folder: string }) {
     let q: { path: string; file: Express.Multer.File }[];

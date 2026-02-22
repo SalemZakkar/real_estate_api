@@ -1,5 +1,7 @@
-asool-key.json
-/asool-key.json
+# Environment files
+.env
+.env.docker
+
 /uploads/
 /public/
 /node_modules/

@@ -4,7 +4,6 @@ import { FileModule } from './file/file.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { OtpModule } from './otp/otp.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
