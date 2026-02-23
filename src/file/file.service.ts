@@ -110,6 +110,16 @@ export class FileService {
     }
   }
 
+  async getManyByIds(id: UUID[]) {
+    let files = await this.repo.findBy({ id: In(id) });
+    if (files.length != id.length) {
+      let k = files.map((e) => e.id);
+      let not = id.filter((e) => !k.includes(e));
+      throw new NotFoundException('Files ' + not + ' Not Found');
+    }
+    return files;
+  }
+
   async executeFileTransaction(opt: {
     queryRunner?: QueryRunner;
     deleteIds?: UUID[];

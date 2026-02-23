@@ -3,6 +3,7 @@ import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { User } from '../src/user/entities/user.entity';
 import { UserRoleType } from '../src/user/entities/user-role.type';
 import { AppFile } from '../src/file/entity/app-file.entity';
+import { seedCities } from './city.factory';
 
 export class MainSeeder implements Seeder {
   public async run(
@@ -20,5 +21,6 @@ export class MainSeeder implements Seeder {
       role: UserRoleType.Admin,
     });
     console.log('Seeded Users');
+    await seedCities(dataSource);
   }
 }

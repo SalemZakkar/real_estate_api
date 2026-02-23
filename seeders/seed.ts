@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import { User } from '../src/user/entities/user.entity';
 import { AppFile } from '../src/file/entity/app-file.entity';
+import { City } from '../src/city/entity/city.entity';
 dotenv.config({ path: '.env' });
 const options: SeederOptions = {
   factories: [UserFactory],
@@ -20,8 +21,8 @@ const ds = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: false,
-  entities: [User, AppFile],
+  synchronize: true,
+  entities: [User, AppFile , City],
 });
 
 ds.initialize().then(async () => {
