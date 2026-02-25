@@ -82,18 +82,21 @@ export class Property {
   @Column({
     type: 'enum',
     enum: PropertyType,
+    enumName: 'property_type_enum',
   })
   propertyType!: PropertyType;
 
   @Column({
     type: 'enum',
     enum: PropertyCategory,
+    enumName: 'property_category_enum',
   })
   category!: PropertyCategory;
 
   @Column({
     type: 'enum',
     enum: PropertyDeedType,
+    enumName: 'property_deed_enum',
   })
   propertyDeedType!: PropertyDeedType;
 
@@ -101,6 +104,7 @@ export class Property {
     type: 'enum',
     enum: PropertyStatus,
     default: PropertyStatus.unCompleted,
+    enumName: 'property_status_enum',
   })
   status!: PropertyStatus;
 

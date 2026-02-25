@@ -11,17 +11,31 @@ import {
   PropertyType,
 } from '../../property/entites/property.enum';
 import { City } from '../../city/entity/city.entity';
-import { join } from 'path';
+import { basename, join } from 'path';
+import * as fs from 'fs/promises';
 
-const basePath = join(process.cwd(), 'src', 'database', 'seeders', 'files');
+const seedPath = join(process.cwd(), 'src', 'database', 'seeders', 'files');
+const basePath = join(process.env.FILE_STORE!, 'seeds');
 
-const files = Array.from({ length: 10 }, (_, i) =>
-  join(basePath, `${i + 1}.jpg`),
+const seedFiles = Array.from({ length: 10 }, (_, i) =>
+  join(seedPath, `${i + 1}.jpg`),
 );
+
+let files: string[] = [];
 
 export const PropertyFactory = setSeederFactory(
   Property,
   async (faker: Faker) => {
+    for (const p of seedFiles) {
+      let name = basename(p);
+      let dest = join(basePath, name);
+      await fs.mkdir(basePath, { recursive: true });
+
+      try {
+        await fs.copyFile(p, dest);
+        files.push(dest);
+      } catch (e) {}
+    }
     const property = new Property();
 
     // Random price, size, rooms

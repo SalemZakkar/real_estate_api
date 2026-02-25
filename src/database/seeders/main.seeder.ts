@@ -29,6 +29,6 @@ export class MainSeeder implements Seeder {
       role: UserRoleType.User,
     });
     await seedCities(dataSource);
-    await factoryManager.get(Property).saveMany(40);
+    await factoryManager.get(Property).saveMany(13);
   }
 }
