@@ -2,6 +2,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -10,15 +11,18 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  Max,
   Min,
+  Validate,
 } from 'class-validator';
 import {
-  RealEstateCategory,
-  RealEstateStatus,
-  RealEstatePropertyDeedType,
-  RealEstatePropertyType,
-} from './../entity/property.enum';
+  PropertyCategory,
+  PropertyDeedType,
+  PropertyType,
+  PropertyStatus,
+} from '../entites/property.enum';
 import { UUID } from 'crypto';
+import { WithValidator } from 'core';
 
 export class PropertyEditDto {
   @IsNumber()
@@ -28,7 +32,7 @@ export class PropertyEditDto {
 
   @IsUUID()
   @IsOptional()
-  cityId?: string;
+  cityId?: UUID;
 
   @IsString()
   @IsNotEmpty()
@@ -53,19 +57,19 @@ export class PropertyEditDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  propertyAge?: number;
+  propertyAge?: number; //
 
-  @IsEnum(RealEstatePropertyType)
+  @IsEnum(PropertyType)
   @IsOptional()
-  propertyType?: RealEstatePropertyType;
+  propertyType?: PropertyType;
 
-  @IsEnum(RealEstateCategory)
+  @IsEnum(PropertyCategory)
   @IsOptional()
-  category?: RealEstateCategory;
+  category?: PropertyCategory;
 
-  @IsEnum(RealEstatePropertyDeedType)
+  @IsEnum(PropertyDeedType)
   @IsOptional()
-  propertyDeedType?: RealEstatePropertyDeedType;
+  propertyDeedType?: PropertyDeedType;
 
   @IsInt()
   @Min(0)
@@ -81,9 +85,31 @@ export class PropertyEditDto {
   address?: string;
 
   @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(6)
-  @ArrayMinSize(1)
-  @IsUUID('4', { each: true })
-  images?: UUID[];
+  @IsBoolean()
+  isFeature?: boolean;
+
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  @Max(2400)
+  stocks?: number;
+
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  @IsOptional()
+  lat?: number;
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  @IsOptional()
+  lng?: number;
+
+  @Validate(WithValidator, ['lat', 'lng'])
+  combineLatLng?: void;
+}
+
+export class PropertyStatusDto {
+  @IsEnum(PropertyStatus)
+  status!: PropertyStatus;
 }

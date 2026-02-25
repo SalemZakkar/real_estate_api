@@ -44,7 +44,10 @@ export class AuthService {
   }
 
   async loginOtp(phone: string, code: string) {
-    let res = await this.userService.createOrExists(phone);
+    let res = await this.userService.findOne({phone: phone});
+    if(!res){
+      throw new AuthWrongCredentialsException();
+    }
     let otp = await this.otpService.find({
       user: {id: res.id},
       channel: OtpChannelEnum.Phone,

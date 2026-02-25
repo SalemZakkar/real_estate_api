@@ -7,53 +7,62 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  Max,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
 import {
-  RealEstateCategory,
-  RealEstateStatus,
-  RealEstatePropertyDeedType,
-  RealEstatePropertyType,
-} from './../entity/property.enum';
+  PropertyCategory,
+  PropertyDeedType,
+  PropertyType,
+} from '../entites/property.enum';
+import { UUID } from 'crypto';
 
 export class PropertyCreateDto {
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   price!: number;
 
   @IsUUID()
-  cityId!: string;
+  cityId!: UUID;
 
   @IsString()
   @IsNotEmpty()
   neighborhood!: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   size!: number;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   room!: number;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   bathrooms!: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   propertyAge?: number;
 
-  @IsEnum(RealEstatePropertyType)
-  propertyType!: RealEstatePropertyType;
+  @IsEnum(PropertyType)
+  propertyType!: PropertyType;
 
-  @IsEnum(RealEstateCategory)
-  category!: RealEstateCategory;
+  @IsEnum(PropertyCategory)
+  category!: PropertyCategory;
 
-  @IsEnum(RealEstatePropertyDeedType)
-  propertyDeedType!: RealEstatePropertyDeedType;
+  @IsEnum(PropertyDeedType)
+  propertyDeedType!: PropertyDeedType;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   floor!: number;
@@ -65,4 +74,20 @@ export class PropertyCreateDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @Max(2400)
+  stocks?: number;
+
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  lat!: number;
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  lng!: number;
 }

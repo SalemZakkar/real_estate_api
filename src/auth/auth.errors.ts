@@ -31,9 +31,9 @@ export class AuthUnAuthenticatedException extends HttpException {
   }
 }
 
-export class AuthAccountNotVerifiedException extends HttpException {
+export class AuthAccountNotCompletedException extends HttpException {
   constructor() {
-    super('Please Activate this account first', 403);
+    super('Please Complete this account first', 403);
   }
 }
 
@@ -43,5 +43,6 @@ ErrorsRecord.addErrors('AUTH', [
   new AuthRefreshTokenExpiredException(),
   new AuthUnAuthenticatedException(),
   new AuthTokenExpiredException(),
-  new AuthUnAuthenticatedException()
+  new AuthUnAuthenticatedException(),
+  new AuthAccountNotCompletedException()
 ]);

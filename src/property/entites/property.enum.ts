@@ -1,10 +1,10 @@
-export enum RealEstateCategory {
+export enum PropertyCategory {
   buy = 'buy',
   rent = 'rent',
   swap = 'swap',
 }
 
-export enum RealEstateStatus {
+export enum PropertyStatus {
   unCompleted = 'unCompleted',
   pending = 'pending',
   rejected = 'rejected',
@@ -12,16 +12,15 @@ export enum RealEstateStatus {
   unActivated = 'unactive',
 }
 
-export enum RealEstatePropertyDeedType {
+export enum PropertyDeedType {
   green = 'green',
   courtRolling = 'courtRolling',
   municipal = 'municipal',
-  farm = 'farm',
   industrial = 'industrial',
   agricultural = 'agricultural',
 }
 
-export enum RealEstatePropertyType {
+export enum PropertyType {
   apartment = 'apartment',
   land = 'land',
   villa = 'villa',

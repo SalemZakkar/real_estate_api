@@ -29,10 +29,12 @@
   "emitDecoratorMetadata": true,
   "experimentalDecorators": true,
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/database/ds.ts"
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/database/migrations"
   ]
 }

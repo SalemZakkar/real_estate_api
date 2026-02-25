@@ -4,8 +4,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Property } from '../../property/entites/property.entity';
 
 @Entity()
 export class AppFile {

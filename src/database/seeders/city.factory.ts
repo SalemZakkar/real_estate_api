@@ -1,21 +1,21 @@
 import { DataSource } from 'typeorm';
-import { City } from './../src/city/entity/city.entity';
+import { City } from '../../city/entity/city.entity';
 
 export const SYRIAN_GOVERNORATES = [
-  'Damascus',
-  'Rif Dimashq',
-  'Aleppo',
-  'Homs',
-  'Hama',
-  'Latakia',
-  'Tartus',
-  'Deir ez-Zor',
-  'Al-Hasakah',
-  'Ar-Raqqa',
-  'Idlib',
-  'Daraa',
-  'Quneitra',
-  'Sweida',
+  'دمشق',
+  'ريف دمشق',
+  'حلب',
+  'حمص',
+  'حماة',
+  'اللاذقية',
+  'طرطوس',
+  'دير الزور',
+  'الحسكة',
+  'الرقة',
+  'إدلب',
+  'درعا',
+  'القنيطرة',
+  'السويداء',
 ];
 
 export async function seedCities(dataSource: DataSource) {
@@ -29,5 +29,4 @@ export async function seedCities(dataSource: DataSource) {
     }
   }
 
-  console.log('✅ Syrian governorates seeded');
 }

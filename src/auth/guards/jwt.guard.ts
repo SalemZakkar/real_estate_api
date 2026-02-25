@@ -9,3 +9,9 @@ export class JwtGuard extends AuthGuard('jwt') {
     return user;
   }
 }
+
+export class JwtOptionalGuard extends AuthGuard('jwt') {
+  handleRequest(err: any, user: any) {
+    return user || null;
+  }
+}

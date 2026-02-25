@@ -9,6 +9,8 @@ let UserPermissions: AccessConfig = {
   [UserRoleType.Admin]: (user) => [
     {
       action: UserActions.manage,
+      forbiddenBodyFields: undefined,
+      forbiddenQueryFields: undefined,
     },
   ],
 };

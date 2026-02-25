@@ -1,7 +1,8 @@
 import { Repository } from 'typeorm';
 import { City } from './entity/city.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class CityService {
@@ -10,5 +11,13 @@ export class CityService {
   ) {}
   findAll() {
     return this.repo.find();
+  }
+
+  async findById(id: UUID) {
+    let res = await this.repo.findOne({ where: { id: id } });
+    if (!res) {
+      throw new NotFoundException('City ' + id + ' not found');
+    }
+    return res;
   }
 }
