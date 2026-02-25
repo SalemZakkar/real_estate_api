@@ -4,7 +4,6 @@ import {
   initialize,
   createErrorRequestHandler,
   BaseResponseInterceptor,
-  // hashPassword,
 } from 'core';
 import qs from 'qs';
 

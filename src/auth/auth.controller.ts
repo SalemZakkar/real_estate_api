@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Post,
@@ -9,8 +8,8 @@ import {
 import { AuthService } from './auth.service';
 import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import { AuthTokenDto } from './dto/auth-token.dto';
-import { AuthLoginPhoneDto } from './dto/auth-phone.dto';
 import { NoBaseResponse } from 'core';
+import { AuthPhoneDto, AuthVerifyLoginDto } from './dto/auth-phone.dto';
 
 @Controller('auth')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -23,15 +22,12 @@ export class AuthController {
 
   @Post('/requestLoginOtp')
   @NoBaseResponse()
-  async requestLoginOtp(@Body() data: AuthLoginPhoneDto) {
+  async requestLoginOtp(@Body() data: AuthPhoneDto) {
     return await this.authService.requestOtp(data.phoneNumber);
   }
   @Post('/loginOtp')
-  async loginOtp(@Body() data: AuthLoginPhoneDto) {
-    if (!data.code) {
-      throw new BadRequestException('Code is required');
-    }
-    return await this.authService.loginOtp(data.phoneNumber, data.code);
+  async loginOtp(@Body() data: AuthVerifyLoginDto) {
+    return await this.authService.loginOtp(data.vid, data.code);
   }
 
   @Post('/refreshToken')

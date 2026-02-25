@@ -10,6 +10,7 @@ import { comparePassword, signToken, decodeToken } from 'core';
 import { OtpService } from '../otp/otp.service';
 import { OtpChannelEnum } from '../otp/entity/enum/otpchannel.enum';
 import { OtpReasonEnum } from '../otp/entity/enum/otpreason.enum';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -43,19 +44,19 @@ export class AuthService {
     return otp;
   }
 
-  async loginOtp(phone: string, code: string) {
-    let res = await this.userService.findOne({phone: phone});
-    if(!res){
-      throw new AuthWrongCredentialsException();
-    }
+  async loginOtp(vid: UUID, code: string) {
     let otp = await this.otpService.find({
-      user: {id: res.id},
+      id: vid,
       channel: OtpChannelEnum.Phone,
       reason: OtpReasonEnum.login,
     });
-    
+
     if (!otp) {
       throw new BadRequestException('Wrong Otp');
+    }
+    let res = await this.userService.findOne({ id: otp.user.id });
+    if (!res) {
+      throw new AuthWrongCredentialsException();
     }
     await this.otpService.delete(otp.id);
     let token = this.token(res);

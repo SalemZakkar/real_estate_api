@@ -1,18 +1,20 @@
 import {
   IsString,
   IsPhoneNumber,
-  IsOptional,
-  IsPassportNumber,
-  isPhoneNumber,
+  IsUUID,
 } from 'class-validator';
+import { UUID } from 'crypto';
 
 export class AuthPhoneDto {
   @IsPhoneNumber()
   phoneNumber!: string;
 }
 
-export class AuthLoginPhoneDto extends AuthPhoneDto {
+export class AuthVerifyLoginDto  {
   @IsString()
-  @IsOptional()
-  code?: string;
+  code!: string;
+
+  @IsUUID()
+  vid!: UUID;
+
 }

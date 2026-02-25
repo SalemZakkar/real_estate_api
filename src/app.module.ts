@@ -8,6 +8,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PropertyModule } from './property/property.module';
 import { CityModule } from './city/city.module';
 import { AppDataSource } from './database/ds';
+import { ContactUsModule } from './contact_us/contact-us.module';
 
 
 @Module({
@@ -23,6 +24,7 @@ import { AppDataSource } from './database/ds';
     UserModule,
     PropertyModule,
     CityModule,
+    ContactUsModule
   ],
   providers: [
     {

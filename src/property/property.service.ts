@@ -32,9 +32,13 @@ export class PropertyService {
     owner: UUID,
     file: Express.Multer.File,
   ) {
-    let data = omit(property, 'cityId');
+    let data = omit(property, 'cityId', 'lat', 'lng');
     data.city = await this.citySerivice.findById(property.cityId);
     data.owner = { id: owner };
+    data.coordinates = {
+      coordinates: [property.lng, property.lat],
+      type: 'Point',
+    };
     return await this.fileService.executeFileTransaction({
       files: [file],
       folder: 'properties',
@@ -62,7 +66,9 @@ export class PropertyService {
         value !== undefined &&
         key !== 'cityId' &&
         key !== 'images' &&
-        key !== 'status'
+        key !== 'status' &&
+        key !== 'lat' &&
+        key !== 'lng'
       ) {
         (property as any)[key] = value;
       }
@@ -70,6 +76,12 @@ export class PropertyService {
 
     if (dto.cityId) {
       property.city = await this.citySerivice.findById(dto.cityId);
+    }
+    if (dto.lat && dto.lng) {
+      property.coordinates = {
+        coordinates: [dto.lng, dto.lat],
+        type: 'Point',
+      };
     }
     if (!cover) {
       return await this.propertyRepository.save(property);

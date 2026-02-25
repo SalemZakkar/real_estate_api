@@ -29,7 +29,6 @@ import { Request } from 'express';
 import { PropertyGetDto, PropertyMapGetDto } from './dto/property-get.dto';
 import { CASLGuard } from 'core';
 import { PropertyActions } from './property.policy';
-import { da } from '@faker-js/faker';
 import {
   PropertyCategory,
   PropertyDeedType,
