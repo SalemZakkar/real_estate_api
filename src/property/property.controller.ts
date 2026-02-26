@@ -27,7 +27,7 @@ import {
 import { AuthVerificationGuard, JwtGuard, JwtOptionalGuard } from '../auth';
 import { Request } from 'express';
 import { PropertyGetDto, PropertyMapGetDto } from './dto/property-get.dto';
-import { CASLGuard } from 'core';
+import { BasePaginationDto, CASLGuard } from 'core';
 import { PropertyActions } from './property.policy';
 import {
   PropertyCategory,
@@ -41,6 +41,7 @@ import {
   new ValidationPipe({
     transform: true,
     whitelist: true,
+
     forbidNonWhitelisted: true,
   }),
 )
@@ -57,6 +58,16 @@ export class PropertyController {
   async getByMap(@Query() data: PropertyMapGetDto) {
     return { data: await this.propertyService.getByMap(data) };
   }
+
+  @Get('/mine')
+  @UseGuards(JwtGuard)
+  async getMine(@Query() data: BasePaginationDto, @Req() req: Request) {
+    return await this.propertyService.find({
+      skip: data.skip,
+      limit: data.limit,
+      owner: (req.user as any).id,
+    });
+  }
   @Get('metaData')
   async getImages() {
     return {
@@ -72,7 +83,7 @@ export class PropertyController {
     return { data: await this.propertyService.getById(id) };
   }
 
-  @UseGuards(JwtGuard, AuthVerificationGuard)
+  @UseGuards(JwtGuard, AuthVerificationGuard())
   @UseInterceptors(FileInterceptor('cover'))
   @Post()
   async create(
@@ -135,12 +146,16 @@ export class PropertyController {
     CASLGuard('Property', PropertyActions.edit),
   )
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('cover'))
   async edit(
     @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() dto: PropertyEditDto,
     @Req() req: Request,
+    @UploadedFile(new ImageFileValidatorPipeline()) cover?: Express.Multer.File,
   ) {
-    return { data: await this.propertyService.edit(id, dto, req.permissions) };
+    return {
+      data: await this.propertyService.edit(id, dto, req.permissions, cover),
+    };
   }
 
   @UseGuards(JwtGuard, CASLGuard('Property', PropertyActions.delete))

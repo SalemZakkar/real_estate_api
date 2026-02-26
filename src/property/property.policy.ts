@@ -22,7 +22,7 @@ let policy: AccessConfig = {
       entityCondition: (entity) => {
         return (
           entity.owner.id == user.id &&
-          [PropertyStatus.unCompleted, PropertyStatus.pending].includes(entity)
+          [PropertyStatus.unCompleted, PropertyStatus.pending].includes(entity.status)
         );
       },
       forbiddenBodyFields: ['isFeature'],

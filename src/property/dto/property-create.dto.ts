@@ -85,9 +85,11 @@ export class PropertyCreateDto {
   @IsNumber()
   @Min(-180)
   @Max(180)
+  @Type(() => Number)
   lat!: number;
   @IsNumber()
   @Min(-180)
   @Max(180)
+  @Type(() => Number)
   lng!: number;
 }

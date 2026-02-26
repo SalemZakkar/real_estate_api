@@ -6,6 +6,8 @@ import { AppFile } from '../../file/entity/app-file.entity';
 import { Property } from '../../property/entites/property.entity';
 import { seedCities } from './city.factory';
 import { City } from '../../city/entity/city.entity';
+import { ContactUs } from '../../contact_us/entities/contact-us.entity';
+import { AdBanner } from '../../adbanner/entities/ad-banner.entity';
 
 export class MainSeeder implements Seeder {
   public async run(
@@ -16,6 +18,8 @@ export class MainSeeder implements Seeder {
     await dataSource.getRepository(User).deleteAll();
     await dataSource.getRepository(AppFile).deleteAll();
     await dataSource.getRepository(City).deleteAll();
+    await dataSource.getRepository(ContactUs).deleteAll();
+    await dataSource.getRepository(AdBanner).deleteAll();
     await factoryManager.get(User).saveMany(20);
     await dataSource.getRepository(User).save({
       name: 'admin',
@@ -30,5 +34,7 @@ export class MainSeeder implements Seeder {
     });
     await seedCities(dataSource);
     await factoryManager.get(Property).saveMany(13);
+    await factoryManager.get(ContactUs).saveMany(13);
+    await factoryManager.get(AdBanner).saveMany(13);
   }
 }

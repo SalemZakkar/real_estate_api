@@ -23,11 +23,13 @@ import {
 } from '../entites/property.enum';
 import { UUID } from 'crypto';
 import { WithValidator } from 'core';
+import { Transform, Type } from 'class-transformer';
 
 export class PropertyEditDto {
   @IsNumber()
   @IsPositive()
   @IsOptional()
+  @Type(() => Number)
   price?: number;
 
   @IsUUID()
@@ -42,21 +44,25 @@ export class PropertyEditDto {
   @IsNumber()
   @IsPositive()
   @IsOptional()
+  @Type(() => Number)
   size?: number;
 
   @IsInt()
   @Min(0)
   @IsOptional()
+  @Type(() => Number)
   room?: number;
 
   @IsInt()
   @Min(0)
   @IsOptional()
+  @Type(() => Number)
   bathrooms?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Type(() => Number)
   propertyAge?: number; //
 
   @IsEnum(PropertyType)
@@ -74,6 +80,7 @@ export class PropertyEditDto {
   @IsInt()
   @Min(0)
   @IsOptional()
+  @Type(() => Number)
   floor?: number;
 
   @IsOptional()
@@ -86,23 +93,28 @@ export class PropertyEditDto {
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+
   isFeature?: boolean;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
   @Max(2400)
+  @Type(() => Number)
   stocks?: number;
 
   @IsNumber()
   @Min(-180)
   @Max(180)
   @IsOptional()
+  @Type(() => Number)
   lat?: number;
   @IsNumber()
   @Min(-180)
   @Max(180)
   @IsOptional()
+  @Type(() => Number)
   lng?: number;
 
   @Validate(WithValidator, ['lat', 'lng'])

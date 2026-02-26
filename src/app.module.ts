@@ -9,6 +9,8 @@ import { PropertyModule } from './property/property.module';
 import { CityModule } from './city/city.module';
 import { AppDataSource } from './database/ds';
 import { ContactUsModule } from './contact_us/contact-us.module';
+import { AdBanner } from './adbanner/entities/ad-banner.entity';
+import { AdBannerModule } from './adbanner/ad-banner.module';
 
 
 @Module({
@@ -24,7 +26,8 @@ import { ContactUsModule } from './contact_us/contact-us.module';
     UserModule,
     PropertyModule,
     CityModule,
-    ContactUsModule
+    ContactUsModule,
+    AdBannerModule,
   ],
   providers: [
     {

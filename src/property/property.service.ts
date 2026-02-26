@@ -68,7 +68,8 @@ export class PropertyService {
         key !== 'images' &&
         key !== 'status' &&
         key !== 'lat' &&
-        key !== 'lng'
+        key !== 'lng' &&
+        key !== 'cover'
       ) {
         (property as any)[key] = value;
       }
@@ -89,6 +90,7 @@ export class PropertyService {
       return await this.fileService.executeFileTransaction({
         deleteIds: [property.cover!.id],
         folder: 'properties',
+        files: [cover],
         handler: async (handler, files) => {
           property.cover = files.at(0)!;
           return await handler.save(Property, property);

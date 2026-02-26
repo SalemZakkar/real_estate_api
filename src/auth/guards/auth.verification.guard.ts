@@ -9,7 +9,6 @@ export function AuthVerificationGuard(): Type<CanActivate> {
       if (!user?.isCompleted) {
         throw new AuthAccountNotCompletedException();
       }
-
       return true;
     }
   }
