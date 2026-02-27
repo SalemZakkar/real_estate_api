@@ -79,7 +79,7 @@ export class PropertyEditDto {
 
   @IsInt()
   @Min(0)
-  @IsOptional()
+  @IsOptional()x
   @Type(() => Number)
   floor?: number;
 

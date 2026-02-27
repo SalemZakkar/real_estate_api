@@ -43,7 +43,11 @@ export class OtpService {
           nextAttempt: current.nextDate.toISOString(),
         };
       } else {
-        return { sent: false, nextAttempt: current.nextDate.toISOString() };
+        return {
+          sent: false,
+          vid: current.id,
+          nextAttempt: current.nextDate.toISOString(),
+        };
       }
     } else {
       let code = '123456';
@@ -67,7 +71,6 @@ export class OtpService {
       where: params,
     });
   }
-
 
   async delete(vid: string, repo?: Repository<Otp>) {
     let r = repo || this.repo;

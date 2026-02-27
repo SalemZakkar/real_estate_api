@@ -49,6 +49,7 @@ export class AuthService {
       id: vid,
       channel: OtpChannelEnum.Phone,
       reason: OtpReasonEnum.login,
+      code: code,
     });
 
     if (!otp) {
@@ -71,7 +72,7 @@ export class AuthService {
     if (res.isExpired) {
       throw new AuthRefreshTokenExpiredException();
     }
-    let { id } = res.data.id;
+    let id = res.data.id;
     let user = await this.userService.findOne({ id: id });
     if (!user) {
       throw new AuthInvalidTokenException();

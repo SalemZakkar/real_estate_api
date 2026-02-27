@@ -8,9 +8,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PropertyModule } from './property/property.module';
 import { CityModule } from './city/city.module';
 import { AppDataSource } from './database/ds';
-import { ContactUsModule } from './contact_us/contact-us.module';
-import { AdBanner } from './adbanner/entities/ad-banner.entity';
 import { AdBannerModule } from './adbanner/ad-banner.module';
+import { AboutUsModule } from './about_us/about-us.module';
 
 
 @Module({
@@ -26,7 +25,7 @@ import { AdBannerModule } from './adbanner/ad-banner.module';
     UserModule,
     PropertyModule,
     CityModule,
-    ContactUsModule,
+    AboutUsModule,
     AdBannerModule,
   ],
   providers: [

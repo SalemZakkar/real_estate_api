@@ -12,13 +12,6 @@ export class AuthInvalidTokenException extends HttpException {
     super('Invalid Token', 400);
   }
 }
-
-export class AuthTokenExpiredException extends HttpException {
-  constructor() {
-    super('Token Expired', 401);
-  }
-}
-
 export class AuthRefreshTokenExpiredException extends HttpException {
   constructor() {
     super('Refresh Token Expired', 401);
@@ -42,7 +35,6 @@ ErrorsRecord.addErrors('AUTH', [
   new AuthInvalidTokenException(),
   new AuthRefreshTokenExpiredException(),
   new AuthUnAuthenticatedException(),
-  new AuthTokenExpiredException(),
   new AuthUnAuthenticatedException(),
   new AuthAccountNotCompletedException()
 ]);

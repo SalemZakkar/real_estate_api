@@ -9,4 +9,4 @@ let policy: AccessConfig = {
   ],
 };
 
-CASLPermissionsRegister.register('ContactUs', policy);
+CASLPermissionsRegister.register('Aboutus', policy);
