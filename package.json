@@ -8,7 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "cd core && npm run build && cd .. && nest start",
+    "start": "nest start",
+    "start:local": "cd core && npm run build && cd .. && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -36,7 +37,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/typeorm": "^11.0.0",
-    "core": "file:./core",
     "lodash": "^4.17.23",
     "multer": "^2.0.2",
     "nestjs-firebase": "^11.0.1",
@@ -46,7 +46,9 @@
     "qs": "^6.15.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm-extension": "^3.8.0"
+    "typeorm-extension": "^3.8.0",
+    "core": "git+https://github.com/SalemZakkar/nestjs_core_package.git"
+
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
