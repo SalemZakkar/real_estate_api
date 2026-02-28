@@ -16,5 +16,5 @@ export const AppDataSource = new DataSource({
   migrationsTableName: 'migrations',
   migrationsRun: false,
   synchronize: true,
-  url: process.env.LIVEDBURL
+  url: process.env.DBLINK
 });
