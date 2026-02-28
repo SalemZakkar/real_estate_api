@@ -186,10 +186,10 @@ export class PropertyService {
       .leftJoinAndSelect('p.cover', 'cover')
       .leftJoinAndSelect('p.owner', 'user');
 
-    if (perm?.dbQuery) {
-      let [cond, vars] = perm.dbQuery;
-      qb.andWhere(cond, vars);
-    }
+    // if (perm?.dbQuery) {
+    //   let [cond, vars] = perm.dbQuery;
+    //   qb.andWhere(cond, vars);
+    // }
     if (data.price) {
       qb.addOrderBy('p.price', data.price);
     }
