@@ -5,5 +5,5 @@
 /uploads/
 /public/
 /node_modules/
-/core/
+# /core/
 /dist/
