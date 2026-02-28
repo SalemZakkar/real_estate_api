@@ -6,6 +6,7 @@ import {
   BaseResponseInterceptor,
 } from 'core';
 import qs from 'qs';
+import { seed } from './database/seeders/seed-func';
 
 
 async function bootstrap() {
@@ -15,6 +16,10 @@ async function bootstrap() {
   let expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('query parser', (str: string) => qs.parse(str));
   expressApp.get('/api/errors', createErrorRequestHandler());
+  expressApp.get('/api/seed' , async  (req , res) => {
+    await seed();    
+    res.send('seeded');
+  })
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new BaseResponseInterceptor(reflector));
   await app.listen(process.env.PORT!);
