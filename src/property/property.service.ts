@@ -193,8 +193,8 @@ export class PropertyService {
     if (data.price) {
       qb.addOrderBy('p.price', data.price);
     }
-    if (data.size) {
-      qb.addOrderBy('p.size', data.price);
+    if (data.size) {      
+      qb.addOrderBy('p.size', data.size);
     }
     applyPsqlFilter({
       queryBuilder: qb,
