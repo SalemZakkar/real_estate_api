@@ -3,7 +3,7 @@ name: API Health Check
 on:
   schedule:
     # Runs every minute
-    - cron: '*/1 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
