@@ -30,19 +30,24 @@ async function bootstrap() {
 
 bootstrap().then(() => {
   console.log('STARTED');
-  // setInterval(() => {
-  //   http
-  //     .get(`${process.env.HOST!}api/ping`, (res) => {
-  //       let data = '';
-  //       res.on('data', (chunk) => {
-  //         data += chunk;
-  //       });
-  //       res.on('end', () => {
-  //         console.log(`Ping response: ${data}`);
-  //       });
-  //     })
-  //     .on('error', (error) => {
-  //       console.error('Ping failed:', error.message);
-  //     });
-  // }, 15000);
+  setInterval(() => {
+    try{
+      http
+      .get(`${process.env.HOST!}api/ping`, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          console.log(`Ping response: ${data}`);
+        });
+      })
+      .on('error', (error) => {
+        console.error('Ping failed:', error.message);
+      });
+    }catch(e){
+      console.log("Failed to Ping");
+      console.log(e);
+    }
+  }, 15000);
 });
