@@ -21,7 +21,9 @@ export const seederOptions: SeederOptions = {
 
 
 export async function seed() {
-  await AppDataSource.initialize();
+  let ds = AppDataSource;
+  await ds.initialize();
   await runSeeders(AppDataSource, seederOptions);
+  await ds.destroy();
   console.log('✅ Seed');
 }
