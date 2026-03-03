@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:local": "cd core && npm run build && cd .. && nest start",
+    "start:buildcore": "cd core && npm run build && cd .. && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -20,10 +20,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "npx ts-node ./src/database/seeders/seed.ts",
-    "typeorm" : "npx ts-node --require tsconfig-paths/register ./node_modules/typeorm/cli",
-    "mig:gen" : "npm run typeorm -- migration:generate -d src/database/ds.ts src/database/migrations/%npm_config_name%",
-    "mig:create" : "npm run typeorm -- migration:create src/database/migrations/%npm_config_name%",
-    "mig:run" : "npm run typeorm -- migration:run -d src/database/ds.ts"
+    "typeorm": "npx ts-node --require tsconfig-paths/register ./node_modules/typeorm/cli",
+    "mig:gen": "npm run typeorm -- migration:generate -d src/database/ds.ts src/database/migrations/%npm_config_name%",
+    "mig:create": "npm run typeorm -- migration:create src/database/migrations/%npm_config_name%",
+    "mig:run": "npm run typeorm -- migration:run -d src/database/ds.ts"
   },
   "dependencies": {
     "@casl/ability": "^6.8.0",
@@ -37,6 +37,10 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/typeorm": "^11.0.0",
+    "@vercel/blob": "^2.3.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.4",
+    "core": "file:./core",
     "lodash": "^4.17.23",
     "multer": "^2.0.2",
     "nestjs-firebase": "^11.0.1",
@@ -47,8 +51,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "typeorm-extension": "^3.8.0",
-    "core": "git+https://github.com/SalemZakkar/nestjs_core_package.git"
-
+    "vc": "^0.1.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

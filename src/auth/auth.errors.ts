@@ -1,5 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { ErrorsRecord } from 'core';
+// import { ErrorsRecord } from 'core';
 
 export class AuthWrongCredentialsException extends HttpException {
   constructor() {

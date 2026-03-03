@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AdBanner } from './entities/ad-banner.entity';
 import { AdBannerDto } from './dto/ad-banner.dto';
 import { FileService } from '../file/file.service';
+import { transaction } from 'core';
+import { AppFile } from '../file/entity/app-file.entity';
 @Injectable()
 export class AdBannerSerivce {
   constructor(
@@ -13,15 +15,14 @@ export class AdBannerSerivce {
   ) {}
 
   async save(dto: AdBannerDto, file: Express.Multer.File) {
-    return await this.fileService.executeFileTransaction({
-      folder: 'adbanner',
-      files: [file],
-      handler: async (manager, files) => {
-        let k = new AdBanner();
-        k.url = dto.url;
-        k.image = files.at(0)!;
-        return await manager.save(AdBanner, k);
-      },
+    let newImage: AppFile;
+    return await transaction(this.repo.manager.connection, async (em) => {
+      newImage = await this.fileService.store(file, 'banner');
+      let k = new AdBanner();
+      k.url = dto.url;
+      k.image = newImage;
+      await this.fileService.use(newImage.id, em.getRepository(AppFile));
+      return await em.save(AdBanner, k);
     });
   }
 
@@ -35,31 +36,48 @@ export class AdBannerSerivce {
 
   async delete(id: UUID) {
     let k = await this.getById(id);
-    await this.fileService.executeFileTransaction({
-      deleteIds: [k.image.id],
-      folder: 'adbanner',
-      async handler(manager) {
-        await manager.remove(k);
+    transaction(
+      this.repo.manager.connection,
+      async (em) => {
+        await this.fileService.delete(k.image.id, em.getRepository(AppFile));
+        await em.remove(AdBanner, k);
       },
-    });
+      {
+        onDone: () => {
+          this.fileService.cleanUp([k.image.id]);
+        },
+      },
+    );
   }
 
   async edit(id: UUID, dto: AdBannerDto, file?: Express.Multer.File) {
     let k = await this.getById(id);
     k.url = dto.url;
-    if (file) {
-      return await this.fileService.executeFileTransaction({
-        files: [file],
-        deleteIds: k.image ? [k.image.id] : undefined,
-        folder: 'adbanner',
-        handler: async (manager, files) => {
-          k.image = files.at(0)!;
-          return await manager.save(AdBanner, k);
-        },
-      });
-    } else {
+    if (!file) {
       return await this.repo.save(k);
     }
+    let oldImage = k.image;
+    let newImage: AppFile | null;
+    return await transaction(
+      this.repo.manager.connection,
+      async (em) => {
+        newImage = await this.fileService.store(file, 'banner');
+        await this.fileService.delete(oldImage.id, em.getRepository(AppFile));
+        await this.fileService.use(newImage!.id, em.getRepository(AppFile));
+        k.image = newImage!;
+        return await em.save(AdBanner, k);
+      },
+      {
+        onDone: () => {
+          this.fileService.cleanUp([oldImage.id]);
+        },
+        onError: () => {
+          if (newImage) {
+            this.fileService.cleanUp([newImage.id]);
+          }
+        },
+      },
+    );
   }
 
   async getAll() {

@@ -63,11 +63,6 @@ export const PropertyFactory = setSeederFactory(
     const users = await userRepo.find();
     property.owner = faker.helpers.arrayElement(users);
 
-    property.cover = await fileRepo.save({
-      path: faker.helpers.arrayElement(files),
-      type: 'image/jpeg',
-    });
-
     // const files = await fileRepo.find(); // all available files
     // const shuffled = faker.helpers.shuffle(files);
 

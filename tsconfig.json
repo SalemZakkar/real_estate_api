@@ -30,7 +30,6 @@
   "experimentalDecorators": true,
   "include": [
     "src/**/*",
-    "src/database/ds.ts"
   ],
   "exclude": [
     "node_modules",

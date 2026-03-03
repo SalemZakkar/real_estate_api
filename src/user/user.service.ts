@@ -1,13 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { applyPsqlFilter, hashPassword } from 'core';
+import { applyPsqlFilter, hashPassword, transaction } from 'core';
 import { UserAlreadyExistsException } from './user.errors';
 import { UserUpdateDto, UserUpdateMineDto } from './dto/user-update-mine.dto';
 import { UserGetDto } from './dto/user-get.dto';
 import { FileService } from '../file/file.service';
 import { UserCreateDto } from './dto/user-create.dto';
+import { AppFile } from '../file/entity/app-file.entity';
 
 @Injectable()
 export class UserService {
@@ -27,15 +28,28 @@ export class UserService {
     if (user.password) {
       user.password = await hashPassword(user.password, 10);
     }
-    let userCreated = await this.create(user);
-    return await this.fileService.executeFileTransaction({
-      files: file ? [file] : undefined,
-      folder: 'user',
-      async handler(manager, files) {
-        userCreated.image = files.at(0);
-        return manager.save(User, userCreated);
+    let userCreated = this.repo.create(user);
+    if (!file) {
+      return await this.repo.save(userCreated);
+    }
+    let newImage: AppFile | null;
+    return await transaction(
+      this.repo.manager.connection,
+      async (em) => {
+        newImage = await this.fileService.store(file, 'user');
+        userCreated.image = newImage;
+        let res = await em.save(User, userCreated);
+        await this.fileService.use(res.image!.id, em.getRepository(AppFile));
+        return res;
       },
-    });
+      {
+        onError: () => {
+          if (newImage) {
+            this.fileService.cleanUp([newImage.id]);
+          }
+        },
+      },
+    );
   }
 
   async find(
@@ -81,26 +95,48 @@ export class UserService {
     file?: Express.Multer.File,
   ) {
     let user = await this.findById(id);
+
     if (params) {
       user = this.repo.merge(user, params);
     }
-    return await this.fileService.executeFileTransaction({
-      files: file ? [file] : undefined,
-      deleteIds: file && user.image ? [user.image!.id] : undefined,
-      folder: 'user',
-      handler: async (manager, files) => {
-        if (files.at(0)) {
-          user.image = files.at(0);
+    if (!file) {
+      return await this.repo.save(user);
+    }
+    let oldImage = user.image;
+    let newImage: AppFile | null = null;
+    return transaction(
+      this.repo.manager.connection,
+      async (em) => {
+        let repo = em.getRepository(User);
+        let fRepo = em.getRepository(AppFile);
+        if (oldImage) {
+          await this.fileService.delete(oldImage.id, fRepo);
         }
-        return await manager.save(User, user);
+        newImage = await this.fileService.store(file, 'user');
+        user.image = newImage;
+        await this.fileService.use(newImage!.id, fRepo);
+        return await repo.save(user);
       },
-    });
+      {
+        onDone: () => {
+          if (oldImage) {
+            this.fileService.cleanUp([oldImage!.id]);
+          }
+        },
+        onError: () => {
+          if (newImage) {
+            this.fileService.cleanUp([newImage!.id]);
+          }
+        },
+      },
+    );
   }
 
   async deletePhoto(id: string) {
     let user = await this.findById(id);
     if (user.image) {
-      await this.fileService.deleteFiles([user.image.id]);
+      await this.fileService.delete(user.image!.id);
+      this.fileService.cleanUp([user.image!.id]);
       user.image = null;
     }
     return user;

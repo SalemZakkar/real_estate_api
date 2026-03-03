@@ -5,6 +5,7 @@ import {
   createErrorRequestHandler,
   BaseResponseInterceptor,
 } from 'core';
+
 import qs from 'qs';
 import { seed } from './database/seeders/seed-func';
 import http from 'http';
@@ -15,7 +16,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   let expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('query parser', (str: string) => qs.parse(str));
-  expressApp.get('/api/errors', createErrorRequestHandler());
+  // expressApp.get('/api/errors', createErrorRequestHandler());
   expressApp.get('/api/seed', async (req, res) => {
     await seed();
     res.send('seeded');
@@ -30,24 +31,4 @@ async function bootstrap() {
 
 bootstrap().then(() => {
   console.log('STARTED');
-  setInterval(() => {
-    try{
-      http
-      .get(`${process.env.HOST!}api/ping`, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          console.log(`Ping response: ${data}`);
-        });
-      })
-      .on('error', (error) => {
-        console.error('Ping failed:', error.message);
-      });
-    }catch(e){
-      console.log("Failed to Ping");
-      console.log(e);
-    }
-  }, 15000);
 });

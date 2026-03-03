@@ -57,24 +57,28 @@ export class PropertyGetDto extends BasePaginationDto {
 }
 
 export class PropertyMapGetDto {
-  @Max(180)
-  @Min(-180)
-  @IsNumber()
-  @Type(() => Number)
-  lat!: number;
-  @IsNumber()
-  @Max(180)
-  @Min(-180)
-  @Type(() => Number)
-  lng!: number;
-  @IsNumber()
-  @Max(15000)
-  @Min(1)
-  @Type(() => Number)
-  radius!: number;
-
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => value === 'true')
   isFeature?: boolean;
+  @IsNumber()
+  @Max(180)
+  @Min(-180)
+  @Type(() => Number)
+  north!: number; // max latitude
+  @IsNumber()
+  @Max(180)
+  @Min(-180)
+  @Type(() => Number)
+  south!: number; // min latitude
+  @IsNumber()
+  @Max(180)
+  @Min(-180)
+  @Type(() => Number)
+  east!: number; // max longitude
+  @IsNumber()
+  @Max(180)
+  @Min(-180)
+  @Type(() => Number)
+  west!: number; // min longitude
 }

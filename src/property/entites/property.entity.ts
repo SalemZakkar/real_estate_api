@@ -21,7 +21,7 @@ import {
 } from './property.enum';
 import { User } from '../../user/entities/user.entity';
 import { AppFile } from '../../file/entity/app-file.entity';
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { City } from '../../city/entity/city.entity';
 
 @Entity()
@@ -54,15 +54,6 @@ export class Property {
   @JoinColumn()
   @Transform((e) => e.value?.id)
   video?: AppFile | null;
-
-  @OneToOne(() => AppFile, {
-    onDelete: 'SET NULL',
-    eager: true,
-    nullable: true,
-  })
-  @JoinColumn()
-  @Transform((e) => e.value?.id)
-  cover!: AppFile | null;
 
   @Column()
   neighborhood!: string;
@@ -155,6 +146,11 @@ export class Property {
 
   get isCompleted() {
     return this.images?.length;
+  }
+
+  @Expose()
+  get cover() {
+    return this.images?.at(0)?.id;
   }
 
   // @BeforeInsert()

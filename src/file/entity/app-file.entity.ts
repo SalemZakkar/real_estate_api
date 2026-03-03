@@ -4,11 +4,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Property } from '../../property/entites/property.entity';
+
+export enum FileStatus {
+  used = 'used',
+  unUsed = 'unused',
+  orphan = 'orphan',
+}
 
 @Entity()
 export class AppFile {
@@ -22,4 +25,10 @@ export class AppFile {
   deletedAt?: Date;
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
+  @Column({
+    type: 'enum',
+    enum: Object.values(FileStatus),
+    default: FileStatus.unUsed,
+  })
+  status!: FileStatus;
 }

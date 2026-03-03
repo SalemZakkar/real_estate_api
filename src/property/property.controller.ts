@@ -84,16 +84,14 @@ export class PropertyController {
   }
 
   @UseGuards(JwtGuard, AuthVerificationGuard())
-  @UseInterceptors(FileInterceptor('cover'))
   @Post()
   async create(
     @Body() dto: PropertyCreateDto,
     @Req() req: Request,
-    @UploadedFile(new ImageFileValidatorPipeline(true))
     cover: Express.Multer.File,
   ) {
     return {
-      data: await this.propertyService.create(dto, (req.user as any).id, cover),
+      data: await this.propertyService.create(dto, (req.user as any).id),
     };
   }
 
@@ -146,15 +144,13 @@ export class PropertyController {
     CASLGuard('Property', PropertyActions.edit),
   )
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('cover'))
   async edit(
     @Param('id', new ParseUUIDPipe()) id: UUID,
     @Body() dto: PropertyEditDto,
     @Req() req: Request,
-    @UploadedFile(new ImageFileValidatorPipeline()) cover?: Express.Multer.File,
   ) {
     return {
-      data: await this.propertyService.edit(id, dto, req.permissions, cover),
+      data: await this.propertyService.edit(id, dto, req.permissions),
     };
   }
 
