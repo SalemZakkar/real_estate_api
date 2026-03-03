@@ -1,12 +1,17 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import {
-  AuthInvalidTokenException,
-  AuthRefreshTokenExpiredException,
-  AuthWrongCredentialsException,
-} from './auth.errors';
-import { comparePassword, signToken, decodeToken } from 'core';
+  comparePassword,
+  signToken,
+  decodeToken,
+  ErrorCommonCodes,
+} from 'core';
 import { OtpService } from '../otp/otp.service';
 import { OtpChannelEnum } from '../otp/entity/enum/otpchannel.enum';
 import { OtpReasonEnum } from '../otp/entity/enum/otpreason.enum';
@@ -22,10 +27,16 @@ export class AuthService {
   async signIn(data: AuthSignInDto) {
     let user = await this.userService.findOne({ email: data.email });
     if (!user) {
-      throw new AuthWrongCredentialsException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidCredentials,
+        message: 'Wrong Credentials',
+      });
     }
     if (!(await comparePassword(user.password!, data.password))) {
-      throw new AuthWrongCredentialsException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidCredentials,
+        message: 'Wrong Credentials',
+      });
     }
     let jwt = this.token(user);
     return {
@@ -53,11 +64,17 @@ export class AuthService {
     });
 
     if (!otp) {
-      throw new BadRequestException('Wrong Otp');
+      throw new BadRequestException({
+        code: ErrorCommonCodes.wrongOtp,
+        message: 'Wrong otp',
+      });
     }
     let res = await this.userService.findOne({ id: otp.user.id });
     if (!res) {
-      throw new AuthWrongCredentialsException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidCredentials,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
     }
     await this.otpService.delete(otp.id);
     let token = this.token(res);
@@ -67,15 +84,24 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     let res = decodeToken(refreshToken, process.env.JWTR!);
     if (res.isWrong) {
-      throw new AuthInvalidTokenException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidJwtToken,
+        message: 'Invalid Token',
+      });
     }
     if (res.isExpired) {
-      throw new AuthRefreshTokenExpiredException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.jwtTokenExpired,
+        message: 'TOKEN EXPIRED',
+      });
     }
     let id = res.data.id;
     let user = await this.userService.findOne({ id: id });
     if (!user) {
-      throw new AuthInvalidTokenException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidJwtToken,
+        message: 'Invalid Token',
+      });
     }
     let jwt = this.token(user);
     return { ...jwt, data: user };
@@ -98,7 +124,10 @@ export class AuthService {
   async validate(payload: any) {
     let user = await this.userService.findOne({ id: payload.id });
     if (!user) {
-      throw new AuthInvalidTokenException();
+      throw new BadRequestException({
+        code: ErrorCommonCodes.invalidJwtToken,
+        message: 'Invalid Token',
+      });
     }
     return user;
   }

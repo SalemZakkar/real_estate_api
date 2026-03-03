@@ -1,9 +1,19 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { applyPsqlFilter, hashPassword, transaction } from 'core';
-import { UserAlreadyExistsException } from './user.errors';
+import {
+  AppHttpError,
+  applyPsqlFilter,
+  ErrorCommonCodes,
+  hashPassword,
+  transaction,
+} from 'core';
 import { UserUpdateDto, UserUpdateMineDto } from './dto/user-update-mine.dto';
 import { UserGetDto } from './dto/user-get.dto';
 import { FileService } from '../file/file.service';
@@ -23,7 +33,11 @@ export class UserService {
         where: { email: user.email, phone: user.phone },
       })
     ) {
-      throw new UserAlreadyExistsException();
+      throw new AppHttpError({
+        code: ErrorCommonCodes.userAlreadyExists,
+        statusCode: HttpStatus.CONFLICT,
+        message: 'User Already Exists',
+      });
     }
     if (user.password) {
       user.password = await hashPassword(user.password, 10);

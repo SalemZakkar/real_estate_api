@@ -31,7 +31,7 @@ export class FileService {
     }
   }
 
-  async store(file: Express.Multer.File, folder: string) : Promise<AppFile>{
+  async store(file: Express.Multer.File, folder: string): Promise<AppFile> {
     let path = this.generatePath(folder, file);
     return await transaction(this.ds, async (em) => {
       let repo = em.getRepository(AppFile);
@@ -62,27 +62,43 @@ export class FileService {
     return await fRep.save({ ...res, status: FileStatus.used });
   }
 
-  async cleanUp(fileIds?: string[]) {
-    const queryBuilder = this.repo.createQueryBuilder('file');
-    if (fileIds?.length) {
-      queryBuilder
-        .where('file.id IN (:...ids)', { ids: fileIds })
-        .withDeleted()
-        .andWhere(
-          new Brackets((qb) => {
-            qb.where('file.status != :used', { used: 'used' }).orWhere(
-              'file.deletedAt IS NOT NULL',
-            );
-          }),
-        );
-    } else {
-      queryBuilder
-        .withDeleted()
-        .where('file.status != :status', { status: FileStatus.used })
-        .orWhere('file.deletedAt IS NOT NULL');
-    }
-    const files = await queryBuilder.getMany();
+  async cleanUp(fileIds: string[]) {
+    if (!fileIds.length) return;
 
+    const files = await this.repo
+      .createQueryBuilder('file')
+      .withDeleted()
+      .where('file.id IN (:...ids)', { ids: fileIds })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('file.status != :used', { used: FileStatus.used }).orWhere(
+            'file.deletedAt IS NOT NULL',
+          );
+        }),
+      )
+      .getMany();
+
+    await this.deleteFiles(files);
+  }
+
+  async cleanUpAll() {
+  const cutoff = new Date(Date.now() - 5 * 60 * 1000);
+  const files = await this.repo
+    .createQueryBuilder('file')
+    .withDeleted()
+    .where(
+      new Brackets((qb) => {
+        qb.where('file.status != :used', { used: FileStatus.used })
+          .orWhere('file.deletedAt IS NOT NULL');
+      }),
+    )
+    .andWhere('file.createdAt < :cutoff', { cutoff })
+    .getMany();
+
+  await this.deleteFiles(files);
+  }
+
+  private async deleteFiles(files: AppFile[]) {
     for (const file of files) {
       try {
         if (await this.fileExists(file.path)) {
@@ -109,7 +125,6 @@ export class FileService {
     const uploadsRoot = join(this.ROOT, folder);
     const ext = extname(file.originalname);
     const filename = `${uuidv4()}${ext}`;
-    // console.log(join(uploadsRoot, filename));
     return join(uploadsRoot, filename);
   }
 }

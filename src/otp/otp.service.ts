@@ -1,16 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  Repository,
-  DataSource,
-  DeepPartial,
-  FindOneOptions,
-  FindOptionsWhere,
-} from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { OtpReasonEnum } from './entity/enum/otpreason.enum';
 import { OtpChannelEnum } from './entity/enum/otpchannel.enum';
 import { Otp } from './entity/otp.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OtpWrongCodeException } from './otp.errors';
 
 @Injectable()
 export class OtpService {
@@ -74,9 +67,6 @@ export class OtpService {
 
   async delete(vid: string, repo?: Repository<Otp>) {
     let r = repo || this.repo;
-    let res = await r.delete({ id: vid });
-    if (!res.affected) {
-      throw new OtpWrongCodeException();
-    }
+    await r.delete({ id: vid });
   }
 }

@@ -1,6 +1,4 @@
 import { FileModule } from '../file/file.module';
-
-require('./user.errors');
 require('./user.permissions');
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';

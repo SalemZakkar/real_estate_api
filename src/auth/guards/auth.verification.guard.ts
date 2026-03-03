@@ -1,5 +1,5 @@
-import { CanActivate, ExecutionContext, mixin, Type } from '@nestjs/common';
-import { AuthAccountNotCompletedException } from '../auth.errors';
+import { CanActivate, ExecutionContext, HttpStatus, mixin, Type } from '@nestjs/common';
+import { AppHttpError, ErrorCommonCodes } from 'core';
 
 export function AuthVerificationGuard(): Type<CanActivate> {
   class EmailVerifiedGuardMixin implements CanActivate {
@@ -7,7 +7,11 @@ export function AuthVerificationGuard(): Type<CanActivate> {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
       if (!user?.isCompleted) {
-        throw new AuthAccountNotCompletedException();
+        throw new AppHttpError({
+          code: ErrorCommonCodes.accountNotCompletedYet,
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'Account not verified yet',
+        });
       }
       return true;
     }

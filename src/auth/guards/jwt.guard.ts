@@ -1,10 +1,15 @@
+import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthUnAuthenticatedException } from '../auth.errors';
+import { AppHttpError, ErrorCommonCodes } from 'core';
 
 export class JwtGuard extends AuthGuard('jwt') {
   handleRequest(err: any, user: any) {
     if (!user || err) {
-      throw new AuthUnAuthenticatedException();
+      throw new AppHttpError({
+        code: ErrorCommonCodes.unauthenticated,
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Unauthinticated',
+      });
     }
     return user;
   }

@@ -10,27 +10,7 @@ class ErrorRecord {
         return this.table;
     }
     addErrors(code, error) {
-        this.table.set(code, error.map((e) => {
-            const response = e.getResponse();
-            let message;
-            if (typeof response === 'string') {
-                message = response;
-            }
-            else if (typeof response === 'object' && response !== null) {
-                const r = response;
-                message = Array.isArray(r.message)
-                    ? r.message.join(', ')
-                    : (r.message ?? e.message);
-            }
-            else {
-                message = e.message;
-            }
-            return {
-                code: e.name,
-                statusCode: e.getStatus(),
-                message,
-            };
-        }));
+        this.table.set(code, error);
     }
 }
 let errorRecord = new ErrorRecord();

@@ -1,3 +1,12 @@
+import { ErrorsRecord } from './exceptions';
+import { ErrorCommonCodes } from './error.common.code';
+
+export const RecordInitialErrors = () => {
+  ErrorsRecord.addErrors('MainErrors', Object.values(ErrorCommonCodes));
+};
+
+
+/*
 import {
   BadRequestException,
   UnauthorizedException,
@@ -54,3 +63,4 @@ export const RecordInitialErrors = () => {
     new FileTypeNotAllowed(),
   ]);
 };
+*/

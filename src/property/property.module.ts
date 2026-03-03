@@ -1,4 +1,5 @@
 require('./property.policy');
+require('./property.errors');
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Property } from './entites/property.entity';

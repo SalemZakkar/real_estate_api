@@ -18,6 +18,7 @@ import { PropertyGetDto, PropertyMapGetDto } from './dto/property-get.dto';
 import { applyPsqlFilter, CASLPermission, transaction } from 'core';
 import { PropertyStatus } from './entites/property.enum';
 import { AppFile } from '../file/entity/app-file.entity';
+import { PropertyErrorCodes } from './property.errors';
 @Injectable()
 export class PropertyService {
   constructor(
@@ -82,21 +83,26 @@ export class PropertyService {
     const next = data.status;
 
     if (next === PropertyStatus.unCompleted) {
-      throw new BadRequestException('Cannot revert to unCompleted');
+      throw new BadRequestException({
+        message: 'Cannot revert to unCompleted',
+        code: PropertyErrorCodes.wrongStateSequence,
+      });
     }
 
     switch (next) {
       case PropertyStatus.pending:
         if (current !== PropertyStatus.unCompleted) {
-          throw new BadRequestException(
-            'Pending requires previous status to be unCompleted',
-          );
+          throw new BadRequestException({
+            message: 'Pending requires previous status to be unCompleted',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
         }
 
         if (!prop.isCompleted) {
-          throw new BadRequestException(
-            'Property must be completed before pending',
-          );
+          throw new BadRequestException({
+            message: 'Property must be completed before pending',
+            code: PropertyErrorCodes.propertyNotCompleted,
+          });
         }
         break;
 
@@ -105,15 +111,19 @@ export class PropertyService {
           current !== PropertyStatus.pending &&
           current !== PropertyStatus.unActivated
         ) {
-          throw new BadRequestException(
-            'Active requires Pending or unActivated',
-          );
+          throw new BadRequestException({
+            message: 'Active requires Pending or unActivated',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
         }
         break;
 
       case PropertyStatus.unActivated:
         if (current !== PropertyStatus.active) {
-          throw new BadRequestException('unActivated requires Active status');
+          throw new BadRequestException({
+            message: 'unActivated requires Active status',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
         }
         break;
 
@@ -137,7 +147,10 @@ export class PropertyService {
       throw new ForbiddenException();
     }
     if (image && (prop.images?.length || 0) >= 6) {
-      throw new BadRequestException('6 images at most');
+      throw new BadRequestException({
+        message: '6 images at most',
+        code: PropertyErrorCodes.images6AtMost,
+      });
     }
     if (!prop.images) {
       prop.images = [];
