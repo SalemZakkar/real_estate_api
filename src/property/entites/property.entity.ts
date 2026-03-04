@@ -106,7 +106,7 @@ export class Property {
   floor!: number;
 
   @Column('text', { nullable: true })
-  rejectReason?: string;
+  rejectReason?: string | null;
 
   @Column('text', { nullable: true })
   notes?: string;

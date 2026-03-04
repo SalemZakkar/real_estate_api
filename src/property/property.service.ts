@@ -82,18 +82,10 @@ export class PropertyService {
     const current = prop.status;
     const next = data.status;
 
-    if (next === PropertyStatus.unCompleted) {
-      throw new BadRequestException({
-        message: 'Cannot revert to unCompleted',
-        code: PropertyErrorCodes.wrongStateSequence,
-      });
-    }
-
     switch (next) {
       case PropertyStatus.pending:
         if (current !== PropertyStatus.unCompleted) {
           throw new BadRequestException({
-            message: 'Pending requires previous status to be unCompleted',
             code: PropertyErrorCodes.wrongStateSequence,
           });
         }
@@ -107,12 +99,9 @@ export class PropertyService {
         break;
 
       case PropertyStatus.active:
-        if (
-          current !== PropertyStatus.pending &&
-          current !== PropertyStatus.unActivated
-        ) {
+        if (current !== PropertyStatus.unActivated) {
           throw new BadRequestException({
-            message: 'Active requires Pending or unActivated',
+            message: 'Active requires unActivated',
             code: PropertyErrorCodes.wrongStateSequence,
           });
         }
@@ -127,13 +116,66 @@ export class PropertyService {
         }
         break;
 
-      case PropertyStatus.rejected:
-        break;
+      default:
+        throw new BadRequestException({
+          message: next + ' NOT ALLOWED',
+          code: PropertyErrorCodes.wrongStateSequence,
+        });
     }
 
     prop.status = next;
 
-    return this.propertyRepository.save(prop);
+    return await this.propertyRepository.save(prop);
+  }
+
+  async adminChangeStatus(id: UUID, data: PropertyStatusDto) {
+    const prop = await this.getById(id);
+
+    const current = prop.status;
+    const next = data.status;
+
+    switch (next) {
+      case PropertyStatus.pending:
+        if (!prop.isCompleted) {
+          throw new BadRequestException({
+            message: 'Property must be completed before pending',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
+        }
+        prop.rejectReason = null;
+        break;
+      case PropertyStatus.active:
+        if (!prop.isCompleted) {
+          throw new BadRequestException({
+            message: 'Property must be completed',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
+        }
+        prop.rejectReason = null;
+        break;
+      case PropertyStatus.unActivated:
+        if (!prop.isCompleted) {
+          throw new BadRequestException({
+            message: 'Property must be completed',
+            code: PropertyErrorCodes.wrongStateSequence,
+          });
+        }
+        prop.rejectReason = null;
+        break;
+      case PropertyStatus.rejected:
+        prop.rejectReason = data.rejectReason;
+        break;
+
+      default:
+        throw new BadRequestException({
+          message: next + ' NOT ALLOWED',
+          code: PropertyErrorCodes.wrongStateSequence,
+        });
+    }
+
+    prop.status = next;
+
+    return await this.propertyRepository.save(prop);
   }
 
   async addFile(
@@ -197,6 +239,7 @@ export class PropertyService {
     }
     await this.fileService.delete(fileId);
     this.fileService.cleanUp([fileId]);
+    return await this.getById(id);
   }
 
   async delete(id: UUID, perm: CASLPermission) {

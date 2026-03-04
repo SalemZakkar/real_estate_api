@@ -79,7 +79,7 @@ export class PropertyEditDto {
 
   @IsInt()
   @Min(0)
-  @IsOptional()x
+  @IsOptional()
   @Type(() => Number)
   floor?: number;
 
@@ -94,7 +94,6 @@ export class PropertyEditDto {
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === 'true')
-
   isFeature?: boolean;
 
   @IsNumber()
@@ -124,4 +123,8 @@ export class PropertyEditDto {
 export class PropertyStatusDto {
   @IsEnum(PropertyStatus)
   status!: PropertyStatus;
+
+  @IsString()
+  @IsOptional()
+  rejectReason?: string;
 }

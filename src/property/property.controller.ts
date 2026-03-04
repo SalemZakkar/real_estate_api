@@ -35,6 +35,8 @@ import {
   PropertyStatus,
   PropertyType,
 } from './entites/property.enum';
+import { User } from '../user/entities/user.entity';
+import { UserRoleType } from '../user/entities/user-role.type';
 
 @Controller('property')
 @UsePipes(
@@ -134,7 +136,10 @@ export class PropertyController {
     @Req() req: Request,
   ) {
     return {
-      data: await this.propertyService.changeStatus(id, data, req.permissions),
+      data:
+        (req.user as User).role == UserRoleType.Admin
+          ? await this.propertyService.adminChangeStatus(id, data)
+          : await this.propertyService.changeStatus(id, data, req.permissions),
     };
   }
 
