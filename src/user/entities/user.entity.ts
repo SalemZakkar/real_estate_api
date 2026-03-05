@@ -12,6 +12,9 @@ import {
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { UserRoleType } from './user-role.type';
 import { AppFile } from '../../file/entity/app-file.entity';
+import {
+  PropertySaved,
+} from '../../property/entites/property-saved.entity';
 
 @Index(['email'], { unique: true, where: `"email" IS NOT NULL` })
 @Index(['phone'], {
@@ -24,7 +27,7 @@ import { AppFile } from '../../file/entity/app-file.entity';
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   name?: string;
   @Column({ nullable: true })
   email?: string;
@@ -37,7 +40,11 @@ export class User {
   })
   role!: string;
 
-  @OneToOne(() => AppFile, { onDelete: 'SET NULL', eager: true , nullable: true})
+  @OneToOne(() => AppFile, {
+    onDelete: 'SET NULL',
+    eager: true,
+    nullable: true,
+  })
   @JoinColumn()
   @Transform((e) => e.value?.id)
   image?: AppFile | null;
@@ -46,8 +53,13 @@ export class User {
   createdAt!: Date;
 
   @Exclude()
-  @Column({nullable: true})
+  @Column({ nullable: true })
   password?: string;
+
+  @OneToMany(() => PropertySaved, (favorite) => favorite.user, {
+    nullable: false,
+  })
+  saved?: PropertySaved[];
   @Expose()
   get isCompleted(): boolean {
     return !!this.name;

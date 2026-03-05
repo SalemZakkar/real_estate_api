@@ -21,8 +21,9 @@ import {
 } from './property.enum';
 import { User } from '../../user/entities/user.entity';
 import { AppFile } from '../../file/entity/app-file.entity';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { City } from '../../city/entity/city.entity';
+import { PropertySaved } from './property-saved.entity';
 
 @Entity()
 export class Property {
@@ -138,6 +139,12 @@ export class Property {
   })
   coordinates!: Point;
 
+  @OneToMany(() => PropertySaved, (favorite) => favorite.property, {
+    nullable: false,
+  })
+  @Exclude()
+  saved?: PropertySaved[];
+
   get isEditable() {
     return [PropertyStatus.unCompleted, PropertyStatus.rejected].includes(
       this.status,
@@ -151,6 +158,11 @@ export class Property {
   @Expose()
   get cover() {
     return this.images?.at(0)?.id;
+  }
+
+  @Expose()
+  get isSaved() {
+    return this.saved !== undefined && this.saved?.length != 0;
   }
 
   // @BeforeInsert()

@@ -19,11 +19,14 @@ import { applyPsqlFilter, CASLPermission, transaction } from 'core';
 import { PropertyStatus } from './entites/property.enum';
 import { AppFile } from '../file/entity/app-file.entity';
 import { PropertyErrorCodes } from './property.errors';
+import { PropertySaved } from './entites/property-saved.entity';
 @Injectable()
 export class PropertyService {
   constructor(
     @InjectRepository(Property)
     private readonly propertyRepository: Repository<Property>,
+    @InjectRepository(PropertySaved)
+    private readonly savedRepo: Repository<PropertySaved>,
     @Inject() private readonly fileService: FileService,
     @Inject() private readonly citySerivice: CityService,
   ) {}
@@ -292,21 +295,37 @@ export class PropertyService {
     if (data.isFeature != undefined) {
       qb.andWhere('p.isFeature = :isFeature', { isFeature: data.isFeature });
     }
+    qb.andWhere('p.status = :status', { status: PropertyStatus.active });
     return await qb.getMany();
   }
 
-  async find(data: PropertyGetDto, perm?: CASLPermission) {
+  async find(
+    data: PropertyGetDto,
+    user: { perm?: CASLPermission; id?: string },
+  ) {
     let qb = this.propertyRepository
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.city', 'city')
       .leftJoinAndSelect('p.images', 'appfile')
       .leftJoinAndSelect('p.video', 'v')
       .leftJoinAndSelect('p.owner', 'user');
+    if (user.id) {
+      qb.leftJoin('p.saved', 'saved', 'saved.userId = :userId', {
+        userId: user.id,
+      });
+      qb.addSelect('saved.id');
+      if (data.isSaved == true) {
+        qb.andWhere('saved.id IS NOT NULL');
+      }
+      if (data.isSaved == false) {
+        qb.andWhere('saved.id IS NULL');
+      }
+    }
 
-    // if (perm?.dbQuery) {
-    //   let [cond, vars] = perm.dbQuery;
-    //   qb.andWhere(cond, vars);
-    // }
+    if (user.perm?.dbQuery && data.owner == undefined) {
+      let [cond, vars] = user.perm.dbQuery;
+      qb.andWhere(cond, vars);
+    }
     if (data.price) {
       qb.addOrderBy('p.price', data.price);
     }
@@ -317,6 +336,9 @@ export class PropertyService {
       queryBuilder: qb,
       query: data,
       options: {
+        isSaved: {
+          skip: true,
+        },
         price: {
           skip: true,
         },
@@ -335,11 +357,54 @@ export class PropertyService {
     return { data: list, totalRecords: count };
   }
 
-  async getById(id: UUID) {
-    let res = await this.propertyRepository.findOneBy({ id: id });
+  async getById(id: UUID, user?: { id?: UUID }) {
+    const qb = this.propertyRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.city', 'city')
+      .leftJoinAndSelect('p.images', 'appfile')
+      .leftJoinAndSelect('p.video', 'v')
+      .leftJoinAndSelect('p.owner', 'user')
+      .where('p.id = :id', { id });
+
+    if (user?.id) {
+      qb.leftJoin('p.saved', 'saved', 'saved.userId = :userId', {
+        userId: user.id,
+      }).addSelect('saved.id');
+    }
+
+    const res = await qb.getOne();
+
     if (!res) {
       throw new NotFoundException('Property Not Found');
     }
+
     return res;
+  }
+
+  async save(userId: string, id: UUID) {
+    let exists = await this.propertyRepository.exists({
+      where: { id: id },
+    });
+    if (!exists) {
+      throw new NotFoundException();
+    }
+    let alreadySaved = await this.savedRepo.exists({
+      where: { property: { id: id }, user: { id: userId } },
+    });
+    if (!alreadySaved) {
+      const saved = this.savedRepo.create({
+        user: { id: userId },
+        property: { id: id },
+      });
+
+      return await this.savedRepo.save(saved);
+    }
+  }
+
+  async unSave(userId: string, id: UUID) {
+    return this.savedRepo.delete({
+      user: { id: userId },
+      property: { id: id },
+    });
   }
 }

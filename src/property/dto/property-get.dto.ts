@@ -54,6 +54,11 @@ export class PropertyGetDto extends BasePaginationDto {
   @IsEnum(PropertyStatus)
   @IsOptional()
   status?: PropertyStatus;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
+  isSaved?: boolean;
 }
 
 export class PropertyMapGetDto {

@@ -33,7 +33,7 @@ export class MainSeeder implements Seeder {
       role: UserRoleType.User,
     });
     await seedCities(dataSource);
-    await factoryManager.get(Property).saveMany(13);
+    await factoryManager.get(Property).saveMany(35);
     await factoryManager.get(AboutUs).saveMany(13);
     await factoryManager.get(AdBanner).saveMany(13);
   }

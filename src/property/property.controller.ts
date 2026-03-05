@@ -53,7 +53,10 @@ export class PropertyController {
   @Get()
   @UseGuards(JwtOptionalGuard, CASLGuard('Property', PropertyActions.getAll))
   async getByCriteria(@Query() data: PropertyGetDto, @Req() req: Request) {
-    return await this.propertyService.find(data, req.permissions);
+    return await this.propertyService.find(data, {
+      perm: req.permissions,
+      id: (req.user as any)?.id,
+    });
   }
   @Get('/map')
   @UseGuards(JwtOptionalGuard, CASLGuard('Property', PropertyActions.getAll))
@@ -64,11 +67,26 @@ export class PropertyController {
   @Get('/mine')
   @UseGuards(JwtGuard)
   async getMine(@Query() data: BasePaginationDto, @Req() req: Request) {
-    return await this.propertyService.find({
-      skip: data.skip,
-      limit: data.limit,
-      owner: (req.user as any).id,
-    });
+    return await this.propertyService.find(
+      {
+        skip: data.skip,
+        limit: data.limit,
+        owner: (req.user as any).id,
+      },
+      { id: (req.user as any)?.id, perm: req.permissions },
+    );
+  }
+  @UseGuards(JwtOptionalGuard)
+  @Get(':id')
+  async getById(
+    @Param('id', new ParseUUIDPipe()) id: UUID,
+    @Req() req: Request,
+  ) {
+    return {
+      data: await this.propertyService.getById(id, {
+        id: (req.user as any)?.id,
+      }),
+    };
   }
   @Get('metaData')
   async getImages() {
@@ -78,11 +96,6 @@ export class PropertyController {
       PropertyCategory: Object.values(PropertyCategory),
       PropertyDeedType: Object.values(PropertyDeedType),
     };
-  }
-
-  @Get(':id')
-  async getById(@Param('id', new ParseUUIDPipe()) id: UUID) {
-    return { data: await this.propertyService.getById(id) };
   }
 
   @UseGuards(JwtGuard, AuthVerificationGuard())
@@ -190,5 +203,23 @@ export class PropertyController {
     return {
       data: await this.propertyService.deleteFile(id, fileId, req.permissions),
     };
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':id/save')
+  async addToFavorites(
+    @Param('id', new ParseUUIDPipe()) id: UUID,
+    @Req() req: Request,
+  ) {
+    await this.propertyService.save((req.user as User).id, id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':id/save')
+  async removeFromFavorites(
+    @Param('id', new ParseUUIDPipe()) id: UUID,
+    @Req() req: Request,
+  ) {
+    await this.propertyService.unSave((req.user as User).id, id);
   }
 }
