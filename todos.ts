@@ -1,1 +1,2 @@
 //version
+//thumbnail storing

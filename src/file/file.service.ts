@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppFile, FileStatus } from './entity/app-file.entity';
 import * as fs from 'node:fs/promises';
@@ -8,7 +12,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { UUID } from 'node:crypto';
 import { dirname } from 'node:path';
 import { transaction } from 'core';
-
+import { FileErrors } from './file.errors';
+import { exec } from 'child_process';
+import { mkdir } from 'node:fs/promises';
+import { promisify } from 'node:util';
 @Injectable()
 export class FileService {
   constructor(
@@ -16,6 +23,8 @@ export class FileService {
     private readonly ds: DataSource,
   ) {}
   ROOT = process.env.FILE_STORE!;
+
+  execPromise = promisify(exec);
 
   async getById(id: UUID) {
     let file = await this.repo.findOne({ where: { id } });
@@ -82,20 +91,21 @@ export class FileService {
   }
 
   async cleanUpAll() {
-  const cutoff = new Date(Date.now() - 5 * 60 * 1000);
-  const files = await this.repo
-    .createQueryBuilder('file')
-    .withDeleted()
-    .where(
-      new Brackets((qb) => {
-        qb.where('file.status != :used', { used: FileStatus.used })
-          .orWhere('file.deletedAt IS NOT NULL');
-      }),
-    )
-    .andWhere('file.createdAt < :cutoff', { cutoff })
-    .getMany();
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000);
+    const files = await this.repo
+      .createQueryBuilder('file')
+      .withDeleted()
+      .where(
+        new Brackets((qb) => {
+          qb.where('file.status != :used', { used: FileStatus.used }).orWhere(
+            'file.deletedAt IS NOT NULL',
+          );
+        }),
+      )
+      .andWhere('file.createdAt < :cutoff', { cutoff })
+      .getMany();
 
-  await this.deleteFiles(files);
+    await this.deleteFiles(files);
   }
 
   private async deleteFiles(files: AppFile[]) {
@@ -126,6 +136,32 @@ export class FileService {
     const ext = extname(file.originalname);
     const filename = `${uuidv4()}${ext}`;
     return join(uploadsRoot, filename);
+  }
+  async getVideoThumbnail(id: UUID) {
+    const file = await this.getById(id);
+
+    if (!file.type.startsWith('video')) {
+      throw new BadRequestException({
+        message: 'File Is Not Video',
+        code: FileErrors.invalidThumbnail,
+      });
+    }
+
+    const thumbnailDir = join(process.env.FILE_STORE!, 'temp', 'thumbnails');
+    await mkdir(thumbnailDir, { recursive: true });
+
+    const fileName = `${file.id}.jpg`;
+    const outputPath = join(thumbnailDir, fileName);
+
+    const command = `ffmpeg -y -ss 1 -i "${file.path}" -vframes 1 -vf "scale=320:-1" -q:v 4 -f image2 "${outputPath}"`;
+
+    await this.execPromise(command);
+
+    const buffer = await fs.readFile(outputPath);
+
+    fs.unlink(outputPath).catch(() => {});
+
+    return buffer;
   }
 }
 
