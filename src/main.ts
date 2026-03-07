@@ -28,7 +28,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new BaseResponseInterceptor(reflector));
   app.useGlobalFilters(new GlobalExceptionFilter());
-  await app.listen(process.env.PORT!);
+  await app.listen(process.env.PORT! , '0.0.0.0');
 }
 
 bootstrap().then(() => {
