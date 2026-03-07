@@ -115,7 +115,7 @@ export class Property {
   @Column('text', { nullable: true })
   address?: string;
 
-  @ManyToOne(() => User, { eager: true, nullable: false })
+  @ManyToOne(() => User, { eager: true, nullable: false , onDelete:  "RESTRICT"})
   @JoinColumn()
   owner!: User;
 
@@ -164,15 +164,4 @@ export class Property {
   get isSaved() {
     return this.saved !== undefined && this.saved?.length != 0;
   }
-
-  // @BeforeInsert()
-  // @BeforeUpdate()
-  // async check() {
-  //   if (
-  //     (this.images?.length || 0) >= 1 &&
-  //     this.status == PropertyStatus.unCompleted
-  //   ) {
-  //     this.status = PropertyStatus.pending;
-  //   }
-  // }
 }

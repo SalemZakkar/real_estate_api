@@ -30,4 +30,8 @@ export class AboutUsDto {
   @IsString()
   @IsOptional()
   privacyPolicy?: string;
+
+  @IsUrl()
+  @IsOptional()
+  googlePlayUrl?: string;
 }

@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   HttpStatus,
   Inject,
   Injectable,
@@ -19,6 +20,9 @@ import { UserGetDto } from './dto/user-get.dto';
 import { FileService } from '../file/file.service';
 import { UserCreateDto } from './dto/user-create.dto';
 import { AppFile } from '../file/entity/app-file.entity';
+import { UUID } from 'node:crypto';
+import { Property } from '../property/entites/property.entity';
+import { UserRoleType } from './entities/user-role.type';
 
 @Injectable()
 export class UserService {
@@ -170,5 +174,39 @@ export class UserService {
       await repo.save(user);
     }
     return user;
+  }
+
+  async deleteUser(id: string) {
+    let user = await this.findById(id);
+    if (user.role == UserRoleType.Admin) {
+      throw new ForbiddenException();
+    }
+    let images: AppFile[] = [];
+    await transaction(
+      this.repo.manager.connection,
+      async (em) => {
+        let fRepo = em.getRepository(AppFile);
+        let pRepo = em.getRepository(Property);
+        let userRepo = em.getRepository(User);
+        if (user.image) {
+          images.push(user.image);
+        }
+        let props = await pRepo.find({ where: { owner: { id: user.id } } });
+        props.forEach((e) => {
+          images.push(...e.images!);
+          if (e.video) {
+            images.push(e.video);
+          }
+        });
+        await pRepo.remove(props);
+        await fRepo.softRemove(images);
+        await userRepo.remove(user);
+      },
+      {
+        onDone: () => {
+          this.fileService.cleanUp(images.map((e) => e.id));
+        },
+      },
+    );
   }
 }

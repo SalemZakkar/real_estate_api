@@ -10,6 +10,7 @@ import qs from 'qs';
 import { seed } from './database/seeders/seed-func';
 import http from 'http';
 import { GlobalExceptionFilter } from './common';
+import { ClientVersionGuard } from './common/guards/version.guard';
 
 async function bootstrap() {
   await initialize();
@@ -28,6 +29,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new BaseResponseInterceptor(reflector));
   app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalGuards(app.get(ClientVersionGuard))
   await app.listen(process.env.PORT! , '0.0.0.0');
 }
 

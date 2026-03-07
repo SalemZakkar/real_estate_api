@@ -1,5 +1,5 @@
 import { AccessConfig, CASLPermissionsRegister } from 'core';
-import { UserRoleType } from '../user/entities/user-role.type';
+import { UserRoleType } from '../../user/entities/user-role.type';
 
 let policy: AccessConfig = {
   [UserRoleType.Admin]: (u) => [
@@ -9,4 +9,4 @@ let policy: AccessConfig = {
   ],
 };
 
-CASLPermissionsRegister.register('Adbanner', policy);
+CASLPermissionsRegister.register('management', policy);

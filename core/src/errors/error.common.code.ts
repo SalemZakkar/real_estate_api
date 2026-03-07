@@ -33,6 +33,7 @@ export enum ErrorCommonCodes {
   accountNotCompletedYet = 'ACCOUNT_NOT_COMPLETED_YET',
   invalidCredentials = 'INVALID_CREDENTIALS',
   userAlreadyExists = 'USER_ALREADY_EXISTS',
+  versionNotSupported = 'VERSION_NOT_SUPPORTED'
 }
 
 export function mapExceptionToCommonCode(exception: unknown): ErrorCommonCodes {

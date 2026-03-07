@@ -28,6 +28,7 @@ var ErrorCommonCodes;
     ErrorCommonCodes["accountNotCompletedYet"] = "ACCOUNT_NOT_COMPLETED_YET";
     ErrorCommonCodes["invalidCredentials"] = "INVALID_CREDENTIALS";
     ErrorCommonCodes["userAlreadyExists"] = "USER_ALREADY_EXISTS";
+    ErrorCommonCodes["versionNotSupported"] = "VERSION_NOT_SUPPORTED";
 })(ErrorCommonCodes || (exports.ErrorCommonCodes = ErrorCommonCodes = {}));
 function mapExceptionToCommonCode(exception) {
     if (exception instanceof common_1.NotFoundException) {

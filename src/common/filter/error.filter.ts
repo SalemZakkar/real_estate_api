@@ -22,12 +22,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       });
     }
     if (exception instanceof HttpException) {
-    //   console.log(exception);
-    //   console.log(exception.message);
-    //   console.log(exception.getResponse());
-
       let error = exception.getResponse();
-
       return response.status(exception.getStatus()).json({
         message: error['message']?.toString() || exception.message,
         code: error['code'] ?? mapExceptionToCommonCode(exception),
@@ -36,7 +31,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     console.log(exception);
 
     response.status(500).json({
-      message: 'AHH',
+      message: 'Internal Server Error',
+      code: ErrorCommonCodes.internal,
     });
   }
 }

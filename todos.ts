@@ -1,2 +1,1 @@
-//version
-//thumbnail storing
+//thumbnail storing when live

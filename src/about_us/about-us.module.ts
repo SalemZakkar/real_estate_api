@@ -1,4 +1,3 @@
-require('./about-us.policy');
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AboutUs } from './entities/about-us.entity';

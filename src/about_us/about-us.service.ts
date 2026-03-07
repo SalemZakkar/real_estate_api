@@ -19,6 +19,7 @@ export class AboutUsService {
         instagramLink: null,
         privacyPolicy: null,
         termsAndConditions: null,
+        googlePlayUrl: null,
         phones: [],
       });
       await this.repo.save(config);
@@ -52,7 +53,11 @@ export class AboutUsService {
     }
 
     if (aboutUsDto.phones?.length) {
-      existing.phones =aboutUsDto.phones;
+      existing.phones = aboutUsDto.phones;
+    }
+
+    if (aboutUsDto.googlePlayUrl != undefined) {
+      existing.googlePlayUrl = aboutUsDto.googlePlayUrl;
     }
 
     Object.assign(existing, updateData);

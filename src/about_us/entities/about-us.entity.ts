@@ -4,7 +4,7 @@ export class AboutUs {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true })
   instagramLink?: string | null;
 
   @Column({ type: 'text', nullable: true })
@@ -21,4 +21,7 @@ export class AboutUs {
 
   @Column('text', { nullable: true })
   privacyPolicy?: string | null;
+
+  @Column('text', { nullable: true })
+  googlePlayUrl?: string | null;
 }

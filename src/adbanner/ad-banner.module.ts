@@ -1,4 +1,3 @@
-require('./ad-banner.policy');
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdBannerController } from './ad-banner.controller';

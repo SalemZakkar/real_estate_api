@@ -54,6 +54,12 @@ export class UserController {
     return { data: res };
   }
 
+  @Delete("/mine")
+  @UseGuards(JwtGuard)
+  async deleteMine(@Req() req: Request) {
+    return { data: await this.userService.deleteUser((req.user as User).id) };
+  }
+
   @UseGuards(JwtGuard, CASLGuard('User', UserActions.manage))
   @UseInterceptors(FileInterceptor('image'))
   @Patch('/:id' , )

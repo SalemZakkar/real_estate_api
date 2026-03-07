@@ -37,13 +37,13 @@ export class AdBannerController {
     return { data: await this.service.getAll() };
   }
 
-  @UseGuards(JwtGuard, CASLGuard('Adbanner', 'manage'))
+  @UseGuards(JwtGuard, CASLGuard('management', 'manage'))
   @Delete(':id')
   async delete(@Param('id', new ParseUUIDPipe()) id: UUID) {
     await this.service.delete(id);
   }
 
-  @UseGuards(JwtGuard, CASLGuard('Adbanner', 'manage'))
+  @UseGuards(JwtGuard, CASLGuard('management', 'manage'))
   @Put(':id')
   @UseInterceptors(FileInterceptor('image'))
   async update(
@@ -57,7 +57,7 @@ export class AdBannerController {
     };
   }
 
-  @UseGuards(JwtGuard, CASLGuard('Adbanner', 'manage'))
+  @UseGuards(JwtGuard, CASLGuard('management', 'manage'))
   @UseInterceptors(FileInterceptor('image'))
   @Post()
   async create(
