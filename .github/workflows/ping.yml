@@ -1,52 +1,52 @@
-name: API Health Check
+# name: API Health Check
 
-on:
-  schedule:
-    # Runs every minute
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+# on:
+#   schedule:
+#     # Runs every minute
+#     - cron: '*/5 * * * *'
+#   workflow_dispatch:
 
-jobs:
-  health-check:
-    runs-on: ubuntu-latest
+# jobs:
+#   health-check:
+#     runs-on: ubuntu-latest
     
-    steps:
-      - name: Ping API Endpoint
-        id: ping
-        continue-on-error: true
-        run: |
-          echo "🕐 Pinging API at $(date -u)"
+#     steps:
+#       - name: Ping API Endpoint
+#         id: ping
+#         continue-on-error: true
+#         run: |
+#           echo "🕐 Pinging API at $(date -u)"
           
-          # Make the request and capture response
-          response=$(curl -s -w "\n%{http_code}" \
-            -X GET "https://real-estate-api-lnn0.onrender.com/api/ping" \
-            -H "User-Agent: GitHub-Action" \
-            --max-time 30)
+#           # Make the request and capture response
+#           response=$(curl -s -w "\n%{http_code}" \
+#             -X GET "https://real-estate-api-lnn0.onrender.com/api/ping" \
+#             -H "User-Agent: GitHub-Action" \
+#             --max-time 30)
           
-          # Extract status code (last line)
-          status_code=$(echo "$response" | tail -n1)
-          # Extract response body (everything except last line)
-          body=$(echo "$response" | sed '$d')
+#           # Extract status code (last line)
+#           status_code=$(echo "$response" | tail -n1)
+#           # Extract response body (everything except last line)
+#           body=$(echo "$response" | sed '$d')
           
-          echo "Status Code: $status_code"
-          echo "Response: $body"
+#           echo "Status Code: $status_code"
+#           echo "Response: $body"
           
-          # Save outputs
-          echo "status_code=$status_code" >> $GITHUB_OUTPUT
-          echo "timestamp=$(date -u)" >> $GITHUB_OUTPUT
+#           # Save outputs
+#           echo "status_code=$status_code" >> $GITHUB_OUTPUT
+#           echo "timestamp=$(date -u)" >> $GITHUB_OUTPUT
           
-          # Check if successful
-          if [ "$status_code" -eq 200 ]; then
-            echo "✅ API ping successful"
-          else
-            echo "❌ API ping failed with status $status_code"
-            exit 1
-          fi
+#           # Check if successful
+#           if [ "$status_code" -eq 200 ]; then
+#             echo "✅ API ping successful"
+#           else
+#             echo "❌ API ping failed with status $status_code"
+#             exit 1
+#           fi
       
-      - name: Create Status Badge
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const status = '${{ steps.ping.outputs.status_code }}' === '200' ? 'passing' : 'failing';
-            console.log(`API Health: ${status}`);
+#       - name: Create Status Badge
+#         if: always()
+#         uses: actions/github-script@v6
+#         with:
+#           script: |
+#             const status = '${{ steps.ping.outputs.status_code }}' === '200' ? 'passing' : 'failing';
+#             console.log(`API Health: ${status}`);
